@@ -19,6 +19,24 @@
 
 ---
 
+## Screenshots
+
+<div align="center">
+
+| Launch | Splash |
+|:---:|:---:|
+| ![CLI launch](assets/screenshot_cli.png) | ![Splash screen](assets/screenshot_splash.png) |
+| *One-click `windows_start.bat` launch from the terminal* | *Animated splash screen on startup* |
+
+| Dashboard (idle) | Dashboard (live) |
+|:---:|:---:|
+| ![Dashboard empty](assets/screenshot_dashboard_empty.png) | ![Dashboard live](assets/screenshot_dashboard_live.png) |
+| *Clean dashboard before the bot starts* | *Active session — 7 trades copied, positions and activity log populated* |
+
+</div>
+
+---
+
 ## Table of Contents
 
 - [Copy Target](#copy-target)
