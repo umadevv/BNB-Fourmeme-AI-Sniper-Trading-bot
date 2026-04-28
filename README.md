@@ -164,7 +164,7 @@ The entire system is wrapped in a **dark-themed PyQt6 desktop GUI** with real-ti
 | **Copy engine** | Configurable `COPY_RATIO` scales the leader's notional to your account size |
 | **Risk manager** | Per-trade min/max USD caps and a total exposure ceiling — hard stops before any order fires |
 | **Paper mode** | Full dry-run by default — every signal is logged but no real order is sent |
-| **Live mode** | Fill-Or-Kill orders via `py-clob-client` with exponential-backoff retry (up to 5 attempts) |
+| **Live mode** | Fill-Or-Kill orders via `py-clob-client-v2` (CLOB V2 / pUSD) with exponential-backoff retry (up to 5 attempts) |
 | **Leader feed** | Polls Polymarket's Data API for new position changes at a configurable interval |
 | **Settings UI** | All `.env` values are editable from the GUI's Settings page — no file editing required |
 | **One-click launch** | `windows_start.bat` creates the venv, installs deps, and opens the GUI automatically |
@@ -181,7 +181,7 @@ The entire system is wrapped in a **dark-themed PyQt6 desktop GUI** with real-ti
              │ start/stop              │ positions poll
              ▼                         ▼
     ┌────────────────┐       ┌──────────────────────┐
-    │   BotEmitter   │       │  py-clob-client API  │
+    │   BotEmitter   │       │  py-clob-client-v2   │
     │  (Qt signals)  │       │  (positions + names) │
     └────────┬───────┘       └──────────────────────┘
              │ asyncio thread
@@ -344,6 +344,8 @@ python -m polymarket_copybot run
 
 Copy `.env.example` to `.env` (or edit directly in the GUI's **Settings** page).
 
+> **Polymarket CLOB V2 / pUSD** — As of April 28 2026, Polymarket upgraded to CLOB V2 and replaced USDC.e with **pUSD** (Polymarket USD) as the collateral token. pUSD is backed 1:1 by USDC and the bot uses `py-clob-client-v2` automatically. No changes to your `.env` are required.
+
 ```env
 # ── Mode ──────────────────────────────────────────────────────────────────────
 COPYBOT_MODE=paper          # "paper" (safe default) or "live"
@@ -365,7 +367,7 @@ SIG_TYPE=0                  # 0 = EOA, 1 = proxy, 2 = Gnosis Safe
 PROXY_ADDRESS=              # only for SIG_TYPE 1 or 2
 
 # ── API (leave as defaults unless self-hosting) ───────────────────────────────
-POLYMARKET_API_BASE=https://clob.polymarket.com
+POLYMARKET_API_BASE=https://clob.polymarket.com   # CLOB V2 endpoint
 DATA_API_BASE=https://data-api.polymarket.com
 ```
 
@@ -464,7 +466,7 @@ The three core extension points are intentionally left as thin stubs:
 Implement `events()` to pull real-time position changes from the leader wallet. The default implementation polls the Polymarket Data API; replace or extend it for WebSocket feeds, on-chain event listeners, or custom data sources.
 
 ### `execution.py` — Order execution
-`LiveExecutor` implements FOK orders via `py-clob-client`. Extend it for:
+`LiveExecutor` implements FOK orders via `py-clob-client-v2` (Polymarket CLOB V2, pUSD collateral). Extend it for:
 - Limit orders / time-in-force variants
 - Multi-outcome hedging strategies
 - Integration with a different venue or aggregator
@@ -486,6 +488,6 @@ Please do not commit `.env` files, private keys, or wallet addresses.
 
 <div align="center">
 
-Built with [PyQt6](https://www.riverbankcomputing.com/software/pyqt/) · [py-clob-client](https://github.com/Polymarket/py-clob-client) · [Polymarket](https://polymarket.com)
+Built with [PyQt6](https://www.riverbankcomputing.com/software/pyqt/) · [py-clob-client-v2](https://github.com/Polymarket/py-clob-client-v2) · [Polymarket](https://polymarket.com)
 
 </div>

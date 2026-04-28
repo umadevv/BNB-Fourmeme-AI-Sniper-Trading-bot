@@ -158,7 +158,7 @@ class LeaderFeed:
         - conditionId (market id)
         - asset (token id)
         - side (BUY/SELL)
-        - usdcSize (notional)
+        - usdcSize (notional in pUSD — 1:1 with USDC since the Apr-2026 migration)
         - price
         """
         try:
@@ -175,7 +175,7 @@ class LeaderFeed:
             side_raw = str(item.get("side") or "").lower()
             side = Side.buy if side_raw == "buy" else Side.sell
 
-            # Prefer explicit usdcSize, else fall back to size*price if available
+            # Prefer explicit usdcSize (pUSD, 1:1 USDC since Apr-2026), else fall back to size*price
             usd = item.get("usdcSize")
             price = item.get("price")
             if usd is None:

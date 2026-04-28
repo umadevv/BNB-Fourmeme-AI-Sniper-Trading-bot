@@ -57,10 +57,10 @@ class LiveExecutor(Executor):
             return self._client
 
         try:
-            from py_clob_client.client import ClobClient
+            from py_clob_client_v2.client import ClobClient
         except ImportError as exc:
             raise RuntimeError(
-                "py-clob-client is not installed. Run: pip install py-clob-client"
+                "py-clob-client-v2 is not installed. Run: pip install py-clob-client-v2"
             ) from exc
 
         s = self._settings
@@ -79,9 +79,9 @@ class LiveExecutor(Executor):
             kwargs["funder"] = funder
 
         client = ClobClient("https://clob.polymarket.com", **kwargs)
-        client.set_api_creds(client.create_or_derive_api_creds())
+        client.set_api_creds(client.create_or_derive_api_key())
         self._client = client
-        log.info("ClobClient initialised (sig_type=%d, funder=%s)", s.sig_type, funder or "n/a")
+        log.info("ClobClient V2 initialised (sig_type=%d, funder=%s)", s.sig_type, funder or "n/a")
         return self._client
 
     # ── Single FOK attempt ────────────────────────────────────────────────────
@@ -90,16 +90,15 @@ class LiveExecutor(Executor):
         """
         Blocking call — run inside a thread executor.
 
-        BUY  → amount = USDC to spend          (usd_notional)
-        SELL → amount = number of shares        (usd_notional / price)
+        BUY  → amount = pUSD to spend           (usd_notional)
+        SELL → amount = number of shares         (usd_notional / price)
         """
-        from py_clob_client.clob_types import MarketOrderArgs, OrderType
-        from py_clob_client.order_builder.constants import BUY, SELL
+        from py_clob_client_v2.clob_types import MarketOrderArgs, OrderType
 
         client = self._get_client()
-        side = BUY if signal.side.value.lower() == "buy" else SELL
+        side = "BUY" if signal.side.value.lower() == "buy" else "SELL"
 
-        if side == SELL:
+        if side == "SELL":
             if signal.price and signal.price > 0:
                 amount = signal.usd_notional / signal.price
             else:
@@ -117,10 +116,9 @@ class LiveExecutor(Executor):
             side=side,
             order_type=OrderType.FOK,
         )
-        signed = client.create_market_order(mo)
-        resp = client.post_order(signed, OrderType.FOK)
+        resp = client.create_and_post_market_order(mo, order_type=OrderType.FOK)
 
-        # py-clob-client returns a dict; detect FOK rejection / API error
+        # py-clob-client-v2 returns a dict; detect FOK rejection / API error
         if isinstance(resp, dict):
             error_msg = resp.get("errorMsg") or resp.get("error") or ""
             status    = str(resp.get("status", "")).lower()
@@ -134,8 +132,8 @@ class LiveExecutor(Executor):
                 )
             if order_id:
                 log.info(
-                    "FOK order placed  orderID=%s  side=%s  usd=%.4f  shares=%.4f",
-                    order_id, "BUY" if side == BUY else "SELL", signal.usd_notional, amount,
+                    "FOK order placed  orderID=%s  side=%s  pusd=%.4f  shares=%.4f",
+                    order_id, side, signal.usd_notional, amount,
                 )
                 return ExecutionResult(ok=True, mode="live", details=f"orderID={order_id}")
 

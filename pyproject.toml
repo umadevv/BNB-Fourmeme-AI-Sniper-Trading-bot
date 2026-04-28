@@ -17,7 +17,7 @@ dependencies = [
   "typer>=0.12",
   "rich>=13.7",
   "PyQt6>=6.6",
-  "py-clob-client>=0.18",
+  "py-clob-client-v2>=1.0.0",
   "chalk-fancy>=1.0.9",
 ]
 
