@@ -1,6 +1,6 @@
 <div align="center">
 
-# Polymarket Copybot
+# Polymarket Arbitrage Copy Bot v2 (Apr, 28)
 
 **A professional, GUI-driven copy-trading bot for [Polymarket](https://polymarket.com) — safe by default, live when you're ready.**
 
